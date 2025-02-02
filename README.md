@@ -1,187 +1,360 @@
-![Git Extensions logo](https://cdn.rawgit.com/gitextensions/gitextensions/master/setup/assets/Logo/git-extensions-logo.svg)
+# Git Extensions portable with self-contained .NET Desktop Runtime
+The name says it all.
+Read on for more details.
 
-# Git Extensions
+# What is this?
+This is a fork of [Git Extensions](https://github.com/gitextensions/gitextensions) but **without** any actual **changes to the code**.
+Instead, this replaced `README.md` just explains how I managed to build a self-contained version of the main GUI client - and why.
 
-Git Extensions is a standalone UI tool for managing git repositories.
-It also integrates with Windows Explorer and Microsoft Visual Studio (2015/2017/2019).
+Head over to Git Extension's [README.md](https://github.com/gitextensions/gitextensions/blob/master/README.md) for the original version.
 
-Have a question? Come and talk to us: [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/gitextensions/gitextensions?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) or send us a tweet [![@git_extensions](https://img.shields.io/badge/twitter-%40git__extensions-blue)](https://twitter.com/git_extensions)
+# Why this fork of Git Extensions?
+I needed a way to get Git Extensions working on a **corporate Windows 10 machine without admin rights**.
 
-## Current Status
+The [portable version](https://github.com/gitextensions/gitextensions/releases/latest) wasn't enough for my case, because we still need the [.NET Desktop Runtime 8.x](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) for Git Extensions to run.
+I found no way to install the .NET Desktop Runtime without admin rights, so I built a self-contained version, which simply means the .NET Desktop Runtime comes bundled with the build - at the cost of quadrupling the application size. Today, this is around 174 MB. Easy, if you are stubborn enough and want to stick with your accustomed git GUI client 🤷‍♂️.
 
-<a href="#backers" alt="sponsors on Open Collective"><img src="https://opencollective.com/gitextensions/backers/badge.svg" /></a> <a href="#sponsors" alt="Sponsors on Open Collective"><img src="https://opencollective.com/gitextensions/sponsors/badge.svg" /></a>
+# Setup (on Windows)
+Refer to the [original build instructions](https://github.com/gitextensions/gitextensions/wiki/How-To%3A-build-instructions#how-to-build-and-test-on-ms-windows) for details.
 
-### Next Version ([build instructions](https://github.com/gitextensions/gitextensions/wiki/How-To%3A-build-instructions))
+In short: install the Windows x64 version of [.NET SDK 8](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) as well as MS Visual Studio 2022 Community Edition.
 
-<table>
-  <tr>
-    <th>&nbsp;</th>
-    <th>Windows only</th>
-  </tr>
-  <tr>
-    <td>
-      Runtime environment
-    </td>
-    <td>
-      MS Windows 7SP1+ // <a href="https://dotnet.microsoft.com/download/dotnet/8.0" target=_blank>.NET 8.0 SDK</a>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      Development
-    </td>
-    <td>
-      MS Visual Studio 2022 (v17.8+), C# 12 // VC++ (inc. ATL for x86/x64 for installer)
-    </td>
-  </tr>
-  <tr>
-    <td>
-      Current dev status
-    </td>
-    <td>
-      <a href="https://ci.appveyor.com/project/gitextensions/gitextensions/branch/master"><img alt="Build status" src="https://ci.appveyor.com/api/projects/status/yo5kw7sl6da8danr/branch/master?svg=true" style="max-width:100%;"></a>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      Translations
-    </td>
-    <td>
-      <a target="_blank" style="text-decoration:none; color:black; font-size:66%" href="https://github.com/gitextensions/gitextensions/wiki/Translations" title="More information in the wiki"><img src="https://img.shields.io/badge/tranlations-Transifex-blue" ></a>
-    </td>
-  </tr>
-</table>
+# Build for Windows x64
+> [!IMPORTANT]  
+> I have no idea what I am talking about! 😉  
+> I do frontend development and I have no clue about C# or desktop development in general (yet).  
+> What I got by doing the following just perfectly satisfied my need to get a working Git GUI client. I simply don't know (and have not tested!) what parts or plugins of the application might not work.  
+> I would be more than happy if someone shed some light on what I am doing here...
 
-### Older versions 
+In Visual Studio, simply open the terminal and do
+```ps
+dotnet publish -c Release -r win-x64 --self-contained true
+```
+On my system, I got a warning about duplicate `apphost.exe` files. I found no solution to the problem and decided to ignore it, as long as the resulting build is working.
 
-See [build instructions](https://github.com/gitextensions/gitextensions/wiki/How-To%3A-build-instructions)
+Head over to your project's folder and look at `artifacts\Release\bin\GitExtensions\net8.0-windows\win-x64\`. Within, you should find a directory and file structure like this
 
+<details>
 
-## Downloads
+<summary>Build dir contents</summary>
 
-<a href="https://github.com/gitextensions/gitextensions/releases" rel="nofollow" style="vertical-align: -webkit-baseline-middle;"><img src="https://img.shields.io/github/downloads/gitextensions/gitextensions/total.svg?label=GitHub%20downloads%20(total)&cacheSeconds=86400"></a> <a href="https://sourceforge.net/projects/gitextensions/files" rel="nofollow" style="vertical-align: -webkit-baseline-middle;"><img src="https://img.shields.io/sourceforge/dt/gitextensions.svg?label=SourceForge%20downloads%20(total)&cacheSeconds=86400"></a> <a href="https://chocolatey.org/packages/gitextensions" rel="nofollow" style="vertical-align: -webkit-baseline-middle;"><img src="https://img.shields.io/chocolatey/dt/gitextensions.svg?label=Chocolatey%20downloads%20(total)&cacheSeconds=86400"></a>
+```
+ConEmu\
+Themes\
+Translation\
+ApplicationInsights.config
+GitCommands.dll.config
+GitExtensions.dll.config
+GitExtUtils.dll.config
+Accessibility.dll
+AdysTech.CredentialManager.dll
+AppInsights.WindowsDesktop.dll
+Ben.Demystifier.dll
+BugReporter.dll
+clretwrc.dll
+clrgc.dll
+clrjit.dll
+ConEmuWinForms.dll
+coreclr.dll
+D3DCompiler_47_cor3.dll
+DirectWriteForwarder.dll
+envdte.dll
+ExCSS.dll
+Git.hub.dll
+GitCommands.dll
+GitExtensions.dll
+GitExtensions.Extensibility.dll
+GitExtUtils.dll
+GitUI.dll
+GitUIPluginInterfaces.dll
+hostfxr.dll
+hostpolicy.dll
+ICSharpCode.TextEditor.dll
+Microsoft.AI.DependencyCollector.dll
+Microsoft.ApplicationInsights.dll
+Microsoft.Bcl.AsyncInterfaces.dll
+Microsoft.CSharp.dll
+Microsoft.DiaSymReader.Native.amd64.dll
+Microsoft.Toolkit.HighPerformance.dll
+Microsoft.VisualBasic.dll
+Microsoft.VisualBasic.Core.dll
+Microsoft.VisualBasic.Forms.dll
+Microsoft.VisualStudio.Composition.dll
+Microsoft.VisualStudio.Interop.dll
+Microsoft.VisualStudio.Threading.dll
+Microsoft.VisualStudio.Validation.dll
+Microsoft.Win32.Primitives.dll
+Microsoft.Win32.Registry.dll
+Microsoft.Win32.Registry.AccessControl.dll
+Microsoft.Win32.SystemEvents.dll
+Microsoft.WindowsAPICodePack.dll
+Microsoft.WindowsAPICodePack.Shell.dll
+mscordaccore.dll
+mscordaccore_amd64_amd64_8.0.23.53103.dll
+mscordbi.dll
+mscorlib.dll
+mscorrc.dll
+msquic.dll
+netstandard.dll
+Newtonsoft.Json.dll
+PenImc_cor3.dll
+PresentationCore.dll
+PresentationFramework.dll
+PresentationFramework.Aero.dll
+PresentationFramework.Aero2.dll
+PresentationFramework.AeroLite.dll
+PresentationFramework.Classic.dll
+PresentationFramework.Luna.dll
+PresentationFramework.Royale.dll
+PresentationFramework-SystemCore.dll
+PresentationFramework-SystemData.dll
+PresentationFramework-SystemDrawing.dll
+PresentationFramework-SystemXml.dll
+PresentationFramework-SystemXmlLinq.dll
+PresentationNative_cor3.dll
+PresentationUI.dll
+ReachFramework.dll
+ResourceManager.dll
+RestSharp.dll
+SmartFormat.dll
+SmartFormat.ZString.dll
+SpellChecker.dll
+System.dll
+System.AppContext.dll
+System.Buffers.dll
+System.CodeDom.dll
+System.Collections.dll
+System.Collections.Concurrent.dll
+System.Collections.Immutable.dll
+System.Collections.NonGeneric.dll
+System.Collections.Specialized.dll
+System.ComponentModel.dll
+System.ComponentModel.Annotations.dll
+System.ComponentModel.Composition.dll
+System.ComponentModel.DataAnnotations.dll
+System.ComponentModel.EventBasedAsync.dll
+System.ComponentModel.Primitives.dll
+System.ComponentModel.TypeConverter.dll
+System.Composition.AttributedModel.dll
+System.Composition.Convention.dll
+System.Composition.Hosting.dll
+System.Composition.Runtime.dll
+System.Composition.TypedParts.dll
+System.Configuration.dll
+System.Configuration.ConfigurationManager.dll
+System.Console.dll
+System.Core.dll
+System.Data.dll
+System.Data.Common.dll
+System.Data.DataSetExtensions.dll
+System.Design.dll
+System.Diagnostics.Contracts.dll
+System.Diagnostics.Debug.dll
+System.Diagnostics.DiagnosticSource.dll
+System.Diagnostics.EventLog.dll
+System.Diagnostics.EventLog.Messages.dll
+System.Diagnostics.FileVersionInfo.dll
+System.Diagnostics.PerformanceCounter.dll
+System.Diagnostics.Process.dll
+System.Diagnostics.StackTrace.dll
+System.Diagnostics.TextWriterTraceListener.dll
+System.Diagnostics.Tools.dll
+System.Diagnostics.TraceSource.dll
+System.Diagnostics.Tracing.dll
+System.DirectoryServices.dll
+System.Drawing.dll
+System.Drawing.Common.dll
+System.Drawing.Design.dll
+System.Drawing.Primitives.dll
+System.Dynamic.Runtime.dll
+System.Formats.Asn1.dll
+System.Formats.Tar.dll
+System.Globalization.dll
+System.Globalization.Calendars.dll
+System.Globalization.Extensions.dll
+System.IO.dll
+System.IO.Abstractions.dll
+System.IO.Compression.dll
+System.IO.Compression.Brotli.dll
+System.IO.Compression.FileSystem.dll
+System.IO.Compression.Native.dll
+System.IO.Compression.ZipFile.dll
+System.IO.FileSystem.dll
+System.IO.FileSystem.AccessControl.dll
+System.IO.FileSystem.DriveInfo.dll
+System.IO.FileSystem.Primitives.dll
+System.IO.FileSystem.Watcher.dll
+System.IO.IsolatedStorage.dll
+System.IO.MemoryMappedFiles.dll
+System.IO.Packaging.dll
+System.IO.Pipes.dll
+System.IO.Pipes.AccessControl.dll
+System.IO.UnmanagedMemoryStream.dll
+System.Linq.dll
+System.Linq.Expressions.dll
+System.Linq.Parallel.dll
+System.Linq.Queryable.dll
+System.Memory.dll
+System.Net.dll
+System.Net.Http.dll
+System.Net.Http.Json.dll
+System.Net.HttpListener.dll
+System.Net.Mail.dll
+System.Net.NameResolution.dll
+System.Net.NetworkInformation.dll
+System.Net.Ping.dll
+System.Net.Primitives.dll
+System.Net.Quic.dll
+System.Net.Requests.dll
+System.Net.Security.dll
+System.Net.ServicePoint.dll
+System.Net.Sockets.dll
+System.Net.WebClient.dll
+System.Net.WebHeaderCollection.dll
+System.Net.WebProxy.dll
+System.Net.WebSockets.dll
+System.Net.WebSockets.Client.dll
+System.Numerics.dll
+System.Numerics.Vectors.dll
+System.ObjectModel.dll
+System.Printing.dll
+System.Private.CoreLib.dll
+System.Private.DataContractSerialization.dll
+System.Private.Uri.dll
+System.Private.Xml.dll
+System.Private.Xml.Linq.dll
+System.Reactive.dll
+System.Reactive.Interfaces.dll
+System.Reactive.Linq.dll
+System.Reflection.dll
+System.Reflection.DispatchProxy.dll
+System.Reflection.Emit.dll
+System.Reflection.Emit.ILGeneration.dll
+System.Reflection.Emit.Lightweight.dll
+System.Reflection.Extensions.dll
+System.Reflection.Metadata.dll
+System.Reflection.Primitives.dll
+System.Reflection.TypeExtensions.dll
+System.Resources.Extensions.dll
+System.Resources.Reader.dll
+System.Resources.ResourceManager.dll
+System.Resources.Writer.dll
+System.Runtime.dll
+System.Runtime.CompilerServices.Unsafe.dll
+System.Runtime.CompilerServices.VisualC.dll
+System.Runtime.Extensions.dll
+System.Runtime.Handles.dll
+System.Runtime.InteropServices.dll
+System.Runtime.InteropServices.JavaScript.dll
+System.Runtime.InteropServices.RuntimeInformation.dll
+System.Runtime.Intrinsics.dll
+System.Runtime.Loader.dll
+System.Runtime.Numerics.dll
+System.Runtime.Serialization.dll
+System.Runtime.Serialization.Formatters.dll
+System.Runtime.Serialization.Json.dll
+System.Runtime.Serialization.Primitives.dll
+System.Runtime.Serialization.Xml.dll
+System.Security.dll
+System.Security.AccessControl.dll
+System.Security.Claims.dll
+System.Security.Cryptography.dll
+System.Security.Cryptography.Algorithms.dll
+System.Security.Cryptography.Cng.dll
+System.Security.Cryptography.Csp.dll
+System.Security.Cryptography.Encoding.dll
+System.Security.Cryptography.OpenSsl.dll
+System.Security.Cryptography.Pkcs.dll
+System.Security.Cryptography.Primitives.dll
+System.Security.Cryptography.ProtectedData.dll
+System.Security.Cryptography.X509Certificates.dll
+System.Security.Cryptography.Xml.dll
+System.Security.Permissions.dll
+System.Security.Principal.dll
+System.Security.Principal.Windows.dll
+System.Security.SecureString.dll
+System.ServiceModel.Web.dll
+System.ServiceProcess.dll
+System.Text.Encoding.dll
+System.Text.Encoding.CodePages.dll
+System.Text.Encoding.Extensions.dll
+System.Text.Encodings.Web.dll
+System.Text.Json.dll
+System.Text.RegularExpressions.dll
+System.Threading.dll
+System.Threading.AccessControl.dll
+System.Threading.Channels.dll
+System.Threading.Overlapped.dll
+System.Threading.Tasks.dll
+System.Threading.Tasks.Dataflow.dll
+System.Threading.Tasks.Extensions.dll
+System.Threading.Tasks.Parallel.dll
+System.Threading.Thread.dll
+System.Threading.ThreadPool.dll
+System.Threading.Timer.dll
+System.Transactions.dll
+System.Transactions.Local.dll
+System.ValueTuple.dll
+System.Web.dll
+System.Web.HttpUtility.dll
+System.Windows.dll
+System.Windows.Controls.Ribbon.dll
+System.Windows.Extensions.dll
+System.Windows.Forms.dll
+System.Windows.Forms.Design.dll
+System.Windows.Forms.Design.Editors.dll
+System.Windows.Forms.Primitives.dll
+System.Windows.Input.Manipulations.dll
+System.Windows.Presentation.dll
+System.Xaml.dll
+System.Xml.dll
+System.Xml.Linq.dll
+System.Xml.ReaderWriter.dll
+System.Xml.Serialization.dll
+System.Xml.XDocument.dll
+System.Xml.XmlDocument.dll
+System.Xml.XmlSerializer.dll
+System.Xml.XPath.dll
+System.Xml.XPath.XDocument.dll
+TestableIO.System.IO.Abstractions.dll
+TestableIO.System.IO.Abstractions.Wrappers.dll
+UIAutomationClient.dll
+UIAutomationClientSideProviders.dll
+UIAutomationProvider.dll
+UIAutomationTypes.dll
+vcruntime140_cor3.dll
+WindowsBase.dll
+WindowsFormsIntegration.dll
+wpfgfx_cor3.dll
+BugReporter.exe
+createdump.exe
+GitExtensions.exe
+TranslationApp.exe
+BugReporter.deps.json
+BugReporter.runtimeconfig.json
+GitExtensions.deps.json
+GitExtensions.runtimeconfig.json
+TranslationApp.deps.json
+TranslationApp.runtimeconfig.json
+ConEmuWinForms.pdb
+Git.hub.pdb
+ICSharpCode.TextEditor.pdb
+SpellChecker.pdb
+BugReporter.xml
+ConEmuWinForms.xml
+GitCommands.xml
+GitExtensions.xml
+GitExtensions.Extensibility.xml
+GitExtUtils.xml
+GitUI.xml
+GitUIPluginInterfaces.xml
+ResourceManager.xml
+```
 
-**[Download it now](https://github.com/gitextensions/gitextensions/releases/latest)** or install it with [Chocolatey](https://chocolatey.org/packages/gitextensions) or [Winget](https://winget.run/pkg/GitExtensionsTeam/GitExtensions).
+</details>
+<br>
 
-If you want to **update a portable version**, you should delete all the files and the subfolders from the existing folder except:
+Voilà! 🎉 Running the `GitExtensions.exe` now just works on a Windows machine without the .NET Runtime Desktop v8 installed.
 
-* _GitExtensions.settings_
-* _WindowPositions.xml_
-* User defined themes in folder _Themes_
-
-<table>
-  <tr>
-    <td>
-      <strong>Latest Release: v5.1.1</strong>
-    </td>
-    <td>
-      <a href="https://github.com/gitextensions/gitextensions/releases/latest">[ Download ]</a><br />
-      <a href="https://github.com/gitextensions/gitextensions/releases/latest" rel="nofollow" style="vertical-align: -webkit-baseline-middle;"><img src="https://img.shields.io/github/downloads/gitextensions/gitextensions/latest/total.svg?label=GitHub%20downloads%20(latest)&cacheSeconds=3600"></a>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <strong>Current dev stream</strong><br />
-      NB: expect :unicorn: :unicorn: and :dragon: :dragon:
-    </td>
-    <td>
-      <a href="https://ci.appveyor.com/project/gitextensions/gitextensions/branch/master/artifacts">[ Download ]</a><br />
-      <a href="https://ci.appveyor.com/project/gitextensions/gitextensions/branch/master"><img alt="Build status" src="https://ci.appveyor.com/api/projects/status/yo5kw7sl6da8danr/branch/master?svg=true" style="max-width:100%;"></a>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <strong>Visual Studio VSIX (2022)</strong>
-    </td>
-    <td>
-      <a href="https://marketplace.visualstudio.com/items?itemName=GitExtensionsApp.VS2022">[ Download ]</a> or install from Visual Studio via Extensions
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <strong>Visual Studio VSIX (2015/2017/2019)</strong>
-    </td>
-    <td>
-      <a href="https://marketplace.visualstudio.com/items?itemName=GitExtensionsApp.v341">[ Download ]</a> or install from Visual Studio via Extensions
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <strong>Visual Studio Code VSIX</strong><br />
-      Kudos to <a href="https://github.com/pmiossec" class="author text-inherit">@pmiossec</a>
-    </td>
-    <td>
-      <a href="https://marketplace.visualstudio.com/items?itemName=pmiossec.vscode-gitextensions">[ Download ]</a> or install via VSCode<br />
-      NB: Please direct all discussions about the VSIX to <a href="https://github.com/pmiossec/vscode-gitextensions">its own repo</a>.
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <strong>IntelliJ platform IDEs</strong><br />
-      Kudos to <a href="https://github.com/DmitryZhelnin" class="author text-inherit">@DmitryZhelnin</a>
-    </td>
-    <td>
-      <a href="https://plugins.jetbrains.com/plugin/11511-gitextensions">[ Download ]</a> or install via IDE Plugins settings<br />
-      NB: Please direct all discussions about this plugin to <a href="https://github.com/DmitryZhelnin/git-extensions-intellij">its own repo</a>.
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <strong>Git Extensions for VS Code</strong><br />
-      Kudos to <a href="https://github.com/Carl-Hugo" class="author text-inherit">@Carl-Hugo</a>
-    </td>
-    <td>
-        <p>This extension allows users to <strong>Browse with Git Extensions</strong> from the <em>Explorer</em> and the <em>Editor</em>. It supports a single folder and workspaces. Nothing fancier.</p>
-        <p><a href="https://marketplace.visualstudio.com/items?itemName=forevolve.git-extensions-for-vs-code">[ Download ]</a> from the Marketplace or install via VS Code<br />
-        NB: Please direct all discussions about this extension to <a href="https://github.com/ForEvolve/git-extensions-for-vs-code">its own repo</a>.</p>
-    </td>
-  </tr>
-</table>
-
-# Conduct
-
-Project maintainers pledge to foster an open and welcoming environment, and ask contributors to do the same.
-
-For more information see our [code of conduct](CODE_OF_CONDUCT.md).
-
-# Shoutouts
-
-* We thank all the people who contribute, the project exists because of you<br />
-  <a href="https://github.com/gitextensions/gitextensions/contributors"><img src="https://opencollective.com/gitextensions/contributors.svg?width=890&button=false" /></a>
-* We thank [Transifex](https://www.transifex.com/) for helping us with translations<br />
-  <a href="https://www.transifex.com/" target="_blank"><img src="./src/app/GitUI/Resources/Icons/originals/transifex.svg"></a>
-* We thank [SignPath.io](https://signpath.io/?utm_source=foundation&utm_medium=github&utm_campaign=gitextension) for the free code signing<br />
-  <a href="https://signpath.io/?utm_source=foundation&utm_medium=github&utm_campaign=gitextension" target="_blank"><img src="./src/app/GitUI/Resources/Icons/originals/signpath_logo.png"></a>
-* We thank [SignPath Foundation](https://signpath.org/?utm_source=foundation&utm_medium=github&utm_campaign=gitextension) for the signing certificate
-* We thank [Yusuke Kamiyamane](http://p.yusukekamiyamane.com/) for the icons ([CCA/3.0](http://creativecommons.org/licenses/by/3.0/))
-
-## Backers
-
-Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/gitextensions#backer)]
-
-<a href="https://opencollective.com/gitextensions#backers" target="_blank"><img src="https://opencollective.com/gitextensions/backers.svg?width=890"></a>
-
-## Sponsors
-
-Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/gitextensions#sponsor)]
-
-<a href="https://opencollective.com/gitextensions/sponsor/0/website" target="_blank"><img src="https://opencollective.com/gitextensions/sponsor/0/avatar.svg"></a>
-<a href="https://opencollective.com/gitextensions/sponsor/1/website" target="_blank"><img src="https://opencollective.com/gitextensions/sponsor/1/avatar.svg"></a>
-<a href="https://opencollective.com/gitextensions/sponsor/2/website" target="_blank"><img src="https://opencollective.com/gitextensions/sponsor/2/avatar.svg"></a>
-<a href="https://opencollective.com/gitextensions/sponsor/3/website" target="_blank"><img src="https://opencollective.com/gitextensions/sponsor/3/avatar.svg"></a>
-<a href="https://opencollective.com/gitextensions/sponsor/4/website" target="_blank"><img src="https://opencollective.com/gitextensions/sponsor/4/avatar.svg"></a>
-<a href="https://opencollective.com/gitextensions/sponsor/5/website" target="_blank"><img src="https://opencollective.com/gitextensions/sponsor/5/avatar.svg"></a>
-<a href="https://opencollective.com/gitextensions/sponsor/6/website" target="_blank"><img src="https://opencollective.com/gitextensions/sponsor/6/avatar.svg"></a>
-<a href="https://opencollective.com/gitextensions/sponsor/7/website" target="_blank"><img src="https://opencollective.com/gitextensions/sponsor/7/avatar.svg"></a>
-<a href="https://opencollective.com/gitextensions/sponsor/8/website" target="_blank"><img src="https://opencollective.com/gitextensions/sponsor/8/avatar.svg"></a>
-<a href="https://opencollective.com/gitextensions/sponsor/9/website" target="_blank"><img src="https://opencollective.com/gitextensions/sponsor/9/avatar.svg"></a>
-
-
-# Useful Links
-
-* Website: [gitextensions.github.io](https://gitextensions.github.io/) [Git repo](https://github.com/gitextensions/gitextensions.github.io)
-* Source code: [github.com/gitextensions/gitextensions](https://github.com/gitextensions/gitextensions)
-* Online manual: [git-extensions-documentation.readthedocs.org](https://git-extensions-documentation.readthedocs.org/) [Git repo](https://github.com/gitextensions/GitExtensionsDoc)
-* Issue tracker: [github.com/gitextensions/gitextensions/issues](https://github.com/gitextensions/gitextensions/issues)
-* Wiki: [github.com/gitextensions/gitextensions/wiki](https://github.com/gitextensions/gitextensions/wiki)
-* Gitter chat: [gitter.im/gitextensions/gitextensions](https://gitter.im/gitextensions/gitextensions?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+# Thanks
+Thanks to all the great people making Git Extensions!
